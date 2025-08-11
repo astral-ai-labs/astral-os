@@ -1,0 +1,309 @@
+## Core Development Philosophy
+
+### KISS (Keep It Simple, Stupid)
+
+Simplicity should be a key goal in design. Choose straightforward solutions over complex ones whenever possible. Simple solutions are easier to understand, maintain, and debug.
+
+**Implementation Guidelines:**
+- Implement code in the fewest lines possible without sacrificing clarity
+- Avoid over-engineering solutions - solve today's problem, not tomorrow's hypothetical one
+- Choose straightforward approaches over clever ones
+
+### YAGNI (You Aren't Gonna Need It)
+
+Avoid building functionality on speculation. Implement features only when they are needed, not when you anticipate they might be useful in the future.
+
+### Design Principles
+
+- **Single Responsibility**: Each function, class, and module should have one clear purpose.
+- **Don't Repeat Yourself (DRY)**: Every piece of knowledge should have a single, unambiguous representation in the system.
+  - Extract repeated business logic to private methods
+  - Extract repeated UI markup to reusable components  
+  - Create utility functions for common operations
+- **Fail Fast**: Check for potential errors early and raise exceptions immediately when issues occur.
+- **Principle of Least Surprise**: Code should behave in the way that most users will expect it to behave. Avoid surprising or clever implementations.
+- **Separation of Concerns**: Different areas of functionality should be managed by distinct sections of code with minimal overlap.
+- **Singleton Pattern for Clients**: Use singleton pattern for expensive-to-create clients like database connections, Redis clients, Celery workers, API clients, HTTP sessions, and external service connectors. Initialize once, reuse everywhere.
+
+## 📖 Readability & Clarity - THE HIGHEST PRIORITY
+
+> **"Code is read far more often than it is written"** - Guido van Rossum
+
+Readability and clarity are not optional - they are the **foundation** of maintainable software. Every line of code you write will be read dozens of times by yourself and others. Prioritize human understanding above all else.
+
+**These principles apply universally across ALL languages and tech stacks** - whether you're writing Python, TypeScript, Go, Rust, or any other language. Good code is good code, regardless of syntax.
+
+### The Readability Imperative
+
+**Code must be self-documenting and immediately understandable.** If someone needs to spend more than 30 seconds understanding what a function does, it needs to be rewritten.
+
+### Naming: The Art of Clear Communication
+
+- **Use descriptive, unambiguous names** that explain intent, not implementation
+
+  ```python
+  # ❌ Bad
+  def calc(x, y): ...
+  data = get_info()
+
+  # ✅ Good
+  def calculate_monthly_payment(principal, interest_rate): ...
+  user_profile = fetch_user_profile()
+  ```
+
+  ```typescript
+  // ❌ Bad
+  function proc(d: any): any { ... }
+  const info = getData();
+
+  // ✅ Good
+  function processPaymentTransaction(transaction: PaymentData): ProcessedPayment { ... }
+  const userProfile = fetchUserProfile();
+  ```
+
+- **Names should be searchable and pronounceable**
+
+  ```python
+  # ❌ Bad
+  usr_prf_mgr = UserProfileManager()
+  dt = datetime.now()
+
+  # ✅ Good
+  user_profile_manager = UserProfileManager()
+  current_timestamp = datetime.now()
+  ```
+
+  ```typescript
+  // ❌ Bad
+  const usrMgr = new UserManager();
+  const dt = new Date();
+
+  // ✅ Good
+  const userManager = new UserManager();
+  const currentTimestamp = new Date();
+  ```
+
+- **Use consistent vocabulary throughout the codebase**
+  - Don't mix `get_user()`, `fetch_profile()`, and `retrieve_data()` - pick one pattern and stick to it
+
+### Function Design for Clarity
+
+- **Functions should do ONE thing and do it well**
+- **Function names should be verbs that clearly state what happens**
+
+  ```python
+  # ❌ Bad
+  def user_data(id):
+      # Does this create, fetch, update, or delete?
+
+  # ✅ Good
+  def fetch_user_by_id(user_id):
+  def create_new_user(user_data):
+  def update_user_profile(user_id, updates):
+  ```
+
+  ```typescript
+  // ❌ Bad
+  function userData(id: string): any {
+      // Does this create, fetch, update, or delete?
+  }
+
+  // ✅ Good
+  function fetchUserById(userId: string): User { ... }
+  function createNewUser(userData: CreateUserRequest): User { ... }
+  function updateUserProfile(userId: string, updates: UserUpdate): User { ... }
+  ```
+
+- **Parameters should be self-explanatory**
+
+  ```python
+  # ❌ Bad
+  def process(data, flag, mode):
+
+  # ✅ Good
+  def validate_user_input(form_data, strict_validation=True, validation_mode="comprehensive"):
+  ```
+
+  ```typescript
+  // ❌ Bad
+  function process(data: any, flag: boolean, mode: string): any { ... }
+
+  // ✅ Good
+  function validateUserInput(
+    formData: FormData,
+    strictValidation: boolean = true,
+    validationMode: 'basic' | 'comprehensive' = 'comprehensive'
+  ): ValidationResult { ... }
+  ```
+
+### Code Structure for Human Comprehension
+
+- **Use whitespace strategically** to group related logic
+- **Limit nesting levels** - if you have more than 3 levels of indentation, refactor
+- **Early returns** to reduce cognitive load
+
+  ```python
+  # ❌ Bad
+  def process_order(order):
+      if order.is_valid():
+          if order.payment_confirmed():
+              if order.items_available():
+                  # actual processing logic buried deep
+
+  # ✅ Good
+  def process_order(order):
+      if not order.is_valid():
+          return ValidationError("Invalid order")
+      if not order.payment_confirmed():
+          return PaymentError("Payment not confirmed")
+      if not order.items_available():
+          return InventoryError("Items unavailable")
+
+      # Clear, linear processing logic
+  ```
+
+  ```typescript
+  // ❌ Bad
+  function processOrder(order: Order): ProcessResult {
+    if (order.isValid()) {
+      if (order.paymentConfirmed()) {
+        if (order.itemsAvailable()) {
+          // actual processing logic buried deep
+        }
+      }
+    }
+  }
+
+  // ✅ Good
+  function processOrder(order: Order): ProcessResult {
+    if (!order.isValid()) {
+      return new ValidationError("Invalid order");
+    }
+    if (!order.paymentConfirmed()) {
+      return new PaymentError("Payment not confirmed");
+    }
+    if (!order.itemsAvailable()) {
+      return new InventoryError("Items unavailable");
+    }
+
+    // Clear, linear processing logic
+  }
+  ```
+
+- **For multi-step functions/classes, use numbered emoji comments to guide readers**
+
+  ```python
+  def complete_user_onboarding(user_data):
+      # 1️⃣ Validate input data -----------------
+      if not validate_user_data(user_data):
+          raise ValidationError("Invalid user data")
+
+      # 2️⃣ Create user account -----------------
+      user = create_user_account(user_data)
+
+      # 3️⃣ Send welcome email -----------------
+      send_welcome_email(user.email)
+
+      # 4️⃣ Set up user preferences -----------------
+      initialize_user_preferences(user.id)
+
+      return user
+  ```
+
+  ```typescript
+  class PaymentProcessor {
+    async processPayment(paymentRequest: PaymentRequest): Promise<PaymentResult> {
+      // 1️⃣ Validate payment details -----------------
+      const validation = await this.validatePayment(paymentRequest);
+      if (!validation.isValid) {
+        throw new PaymentValidationError(validation.errors);
+      }
+
+      // 2️⃣ Charge the payment method -----------------
+      const charge = await this.chargePaymentMethod(paymentRequest);
+
+      // 3️⃣ Update order status -----------------
+      await this.updateOrderStatus(paymentRequest.orderId, "paid");
+
+      // 4️⃣ Send confirmation -----------------
+      await this.sendPaymentConfirmation(charge);
+
+      return { success: true, transactionId: charge.id };
+    }
+  }
+  ```
+
+### Comments: When and How
+
+- **Code should be self-explanatory** - comments explain WHY, not WHAT
+- **Write comments for complex business logic and non-obvious decisions**
+
+  ```python
+  # ❌ Bad
+  x = x + 1  # increment x
+
+  # ✅ Good
+  retry_count += 1  # Exponential backoff requires tracking attempts
+  ```
+
+  ```typescript
+  // ❌ Bad
+  count++; // increment count
+
+  // ✅ Good
+  retryCount++; // Circuit breaker pattern requires attempt tracking
+  ```
+
+- **Update comments when code changes** - outdated comments are worse than no comments
+
+### Documentation Standards
+
+- **Every public function/class must have clear docstrings**
+- **Include examples for complex functions**
+- **Document edge cases and error conditions**
+- **Use type hints consistently** to make interfaces crystal clear
+
+### The 5-Minute Rule
+
+**If you can't explain your code to a colleague in 5 minutes, it's too complex.** Simplify until it's immediately understandable.
+
+### Before Finalizing
+
+Before finalizing your output, reglect hard on these questions:
+
+- Can I understand this code without asking the author?
+- Are the names immediately clear?
+- Would a new team member understand this in 2 months?
+- Is the business logic obvious from reading the code?
+
+Remember: **Clever code is bad code.** Prioritize clarity over performance micro-optimizations. Write code for humans first, machines second.
+
+## 🧱 Code Structure & Modularity
+
+### File and Function Limits
+
+- **Never create a file longer than 500 lines of code**. If approaching this limit, refactor by splitting into modules.
+- **Functions should be under 50 lines** with a single, clear responsibility.
+- **Classes should be under 100 lines** and represent a single concept or entity.
+- **Organize code into clearly separated modules**, grouped by feature or responsibility.
+
+## 📦 Dependencies
+
+### Choose Libraries Wisely
+
+When adding third-party dependencies:
+- **Select the most popular and actively maintained option** - popularity indicates community trust and long-term viability
+- **Check the library's GitHub repository** for health indicators:
+  - Recent commits (within last 6 months)
+  - Active issue resolution
+  - Number of stars/downloads
+  - Clear documentation and examples
+- **Minimize dependency count** - each dependency adds complexity and potential security risks
+- **Prefer established, stable libraries** over experimental or cutting-edge alternatives
+- **Review bundle size impact** for frontend dependencies
+
+### File Organization
+
+- **Keep files focused on a single responsibility** - one main purpose per file
+- **Group related functionality together** - organize by feature, not by file type
+- **Use consistent naming conventions** throughout the project

@@ -176,3 +176,5 @@ temp/
 
 # Claude directory
 .claude/ 
+
+claude-code-logs

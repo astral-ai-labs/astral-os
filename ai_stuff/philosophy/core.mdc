@@ -1,0 +1,42 @@
+This file provides comprehensive guidance across all projects. You MUST adhere to these
+
+## Core Development Philosophy
+
+### KISS (Keep It Simple, Stupid)
+
+Simplicity should be a key goal in design. Choose straightforward solutions over complex ones whenever possible. Simple solutions are easier to understand, maintain, and debug.
+
+**Implementation Guidelines:**
+
+- Implement code in the fewest lines possible without sacrificing clarity
+- Avoid over-engineering solutions - solve today's problem, not tomorrow's hypothetical one
+- Choose straightforward approaches over clever ones
+
+### YAGNI (You Aren't Gonna Need It)
+
+Avoid building functionality on speculation. Implement features only when they are needed, not when you anticipate they might be useful in the future.
+
+### Design Principles
+
+- **Single Responsibility**: Each function, class, and module should have one clear purpose.
+- **Don't Repeat Yourself (DRY)**: Every piece of knowledge should have a single, unambiguous representation in the system.
+  - Extract repeated business logic to private methods
+  - Extract repeated UI markup to reusable components
+  - Create utility functions for common operations
+- **Fail Fast**: Check for potential errors early and raise exceptions immediately when issues occur.
+- **Simple Error Handling**: Errors should be obvious, actionable, and caught at the boundary.
+  - Validate inputs at function entry points, fail immediately with clear messages
+  - Let exceptions bubble up - only catch what you can actually handle
+  - Never silently swallow errors (no empty except/catch blocks)
+  - Log errors with context, then either handle or re-raise
+  - One try-catch per function maximum - if you need more, refactor
+  - Example: `if not user_id: raise ValueError("user_id is required")` at function start
+- **Principle of Least Surprise**: Code should behave in the way that most users will expect it to behave. Avoid surprising or clever implementations.
+- **Separation of Concerns**: Different areas of functionality should be managed by distinct sections of code with minimal overlap.
+- **Prefer Functions Over Services**: Default to simple, pure functions organized in logical modules. Avoid unnecessary abstraction layers.
+  - Start with standalone functions that do one thing well
+  - Group related functions in well-named modules (e.g., `user_utils.py`, `validation.ts`)
+  - Only create service classes when you genuinely need: stateful operations, resource management, or complex orchestration
+  - Keep module interfaces simple and predictable
+  - Example: `calculate_tax(amount)` in `finance_utils.py` is better than `TaxCalculationService` unless you need tax rate caching or external API calls
+- **Singleton Pattern for Clients**: Use singleton pattern for expensive-to-create clients like database connections, Redis clients, Celery workers, API clients, HTTP sessions, and external service connectors. Initialize once, reuse everywhere.

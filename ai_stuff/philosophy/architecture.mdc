@@ -40,6 +40,7 @@ project/
 │   ├── config/
 │   ├── db/
 │   └── shared-components/
+├── api/                   # For API projects only
 ├── features/
 │   ├── authentication/    # Level 1 Feature
 │   │   ├── understandMe.md  # ← What auth does & how

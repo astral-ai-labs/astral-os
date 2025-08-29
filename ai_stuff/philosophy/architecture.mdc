@@ -1,16 +1,16 @@
 ---
 alwaysApply: false
 ---
-## High Level Architectural Philosophy
+# High Level Architectural Philosophy
 
-### Core Principle: Build in Isolation, Integrate Through Interfaces
+## Core Principle: Build in Isolation, Integrate Through Interfaces
 
 Every project follows a **layered feature architecture** that enables parallel development. Each feature beyond the shared foundation can be built independently by a single developer, ensuring clear ownership and faster delivery.
 
-### Architecture Layers
+## Architecture Layers
 
-1. **Foundation Layer** (`/platform` or `/core`)
-   - Shared utilities, configs, and base components
+1. **Foundation Layer** (`/core`)
+   - Shared utilities, configs, base components, db, domain types and data access
    - Once established, remains stable - no refactoring during feature development
    - All features can depend on this layer
 
@@ -19,46 +19,61 @@ Every project follows a **layered feature architecture** that enables parallel d
    - Features expose functionality ONLY through their interface (`index.ts` or `__init__.py`)
    - Dependencies flow DOWN only: Level 2 → Level 1 → Foundation
    - NO horizontal dependencies within the same level
+   - Shared code within a layer goes in `/common`
 
-### Key Rules
+## Key Rules
 
 - **One Developer, One Feature**: Each feature module has a single owner
-- **Interface-Only Access**: Never import from feature internals, only from the exposed interface
-- **No Mid-Flight Refactoring**: If you spot reusable patterns while building, add a TODO but don't refactor until the level is complete
+- **Interface-Only Access**: Only import from `features/X/index`, never from internals
+- **No Mid-Flight Refactoring**: If you spot reusable patterns while building, add a TODO but don't refactor until the feature is complete
 - **Git Flow Ready**: Each feature = one branch = one merge request
+- **Use External Libraries**: Prefer external solutions over custom implementations
+- **Export Minimally**: Only export what external consumers actually need
 
-### Example Structure
+## Structure
 
 ```
 project/
-├── platform/              # Foundation Layer
-│   ├── understandMe.md   # ← How platform layer works
+├── core/                   # Foundation Layer
+│   ├── understandMe.md    # ← How core layer works
 │   ├── utils/
 │   ├── config/
+│   ├── db/
 │   └── shared-components/
 ├── features/
 │   ├── authentication/    # Level 1 Feature
 │   │   ├── understandMe.md  # ← What auth does & how
 │   │   ├── index.ts      # ← ONLY entry point
-│   │   ├── components/
-│   │   ├── utils/        # Feature-specific utils
-│   │   └── services/
+│   │   └── ...           # Internal organization by complexity
 │   ├── user-profile/     # Level 1 Feature
-│   │   ├── understandMe.md  # ← Profile feature overview
-│   │   └── index.ts      # ← ONLY entry point
+│   │   ├── understandMe.md
+│   │   └── index.ts      
+│   ├── common/           # Shared Level 1 utilities
+│   │   └── utils.ts
 │   └── dashboard/        # Level 2 Feature (can use auth + profile)
-│       ├── understandMe.md  # ← Dashboard architecture
-│       └── index.ts      # ← ONLY entry point
+│       ├── understandMe.md
+│       ├── index.ts      # ← Can import from authentication/index.ts
+│       └── common/       # Shared Level 2 utilities
 ```
 
-**Remember**: Features should be able to be developed in complete isolation once the foundation is set. If you can't build your feature without touching another feature's code, the architecture is broken.
+**For Web APIs** (FastAPI/Express): Add a separate `/api` module with routers that expose feature functionality through HTTP endpoints. The API layer depends on features, never the reverse.
 
-### Feature Documentation with understandMe.md
+**Remember**: Features should be able to be developed in complete isolation once the foundation is set. If you must modify another feature's code, the architecture has failed.
 
-**EVERY feature and the foundation layer MUST have an `understandMe.md` file**. These are your quick reference guides:
+## Feature Organization
+
+- **Start simple** - organize by complexity, not by rigid file types
+- **Main components get directories** when substantial (100+ lines)
+- **Supporting code stays as files** until it grows large
+- **Use external libraries** over custom solutions
+- **Export minimally** - only what external consumers need
+
+## Feature Documentation with understandMe.md
+
+**EVERY feature and the core layer MUST have an `understandMe.md` file**. These are your quick reference guides:
 
 **When to use understandMe.md:**
-- Read it FIRST when starting work on any feature/foundation layer
+- Read it FIRST when starting work on any feature/core layer
 - Update it AFTER completing significant changes
 - Keep it open while working on complex features
 
@@ -81,100 +96,7 @@ What this feature/layer does and why it exists.
 4. Returns `ThingResult`
 
 ## Dependencies
-- Uses: platform/auth, platform/utils
-- Used by: dashboard, admin-panel
-
-## Key Decisions
-- Why we use [approach X] instead of [approach Y]
-- [Any non-obvious architectural choices]
-```
-
-**Golden Rules for understandMe.md:**
-- **Be ruthless about brevity** - If it's over 50 lines, cut it down
-- **When editing, prefer removing over adding** - Clarity through simplicity
-- **No fluff** - Every line must provide immediate value
-- **Update sparingly** - Only when core behavior changes
-- **Think "cheat sheet"** not "documentation"## High Level Architectural Philosophy
-
-### Core Principle: Build in Isolation, Integrate Through Interfaces
-
-Every project follows a **layered feature architecture** that enables parallel development. Each feature beyond the shared foundation can be built independently by a single developer, ensuring clear ownership and faster delivery.
-
-### Architecture Layers
-
-1. **Foundation Layer** (`/platform` or `/core`)
-   - Shared utilities, configs, and base components
-   - Once established, remains stable - no refactoring during feature development
-   - All features can depend on this layer
-
-2. **Feature Layers** (Level 1, 2, 3...)
-   - Each feature is self-contained with ALL its logic
-   - Features expose functionality ONLY through their interface (`index.ts` or `__init__.py`)
-   - Dependencies flow DOWN only: Level 2 → Level 1 → Foundation
-   - NO horizontal dependencies within the same level
-
-### Key Rules
-
-- **One Developer, One Feature**: Each feature module has a single owner
-- **Interface-Only Access**: Never import from feature internals, only from the exposed interface
-- **No Mid-Flight Refactoring**: If you spot reusable patterns while building, add a TODO but don't refactor until the level is complete
-- **Git Flow Ready**: Each feature = one branch = one merge request
-
-### Example Structure
-
-```
-project/
-├── platform/              # Foundation Layer
-│   ├── understandMe.md   # ← How platform layer works
-│   ├── utils/
-│   ├── config/
-│   └── shared-components/
-├── features/
-│   ├── authentication/    # Level 1 Feature
-│   │   ├── understandMe.md  # ← What auth does & how
-│   │   ├── index.ts      # ← ONLY entry point
-│   │   ├── components/
-│   │   ├── utils/        # Feature-specific utils
-│   │   └── services/
-│   ├── user-profile/     # Level 1 Feature
-│   │   ├── understandMe.md  # ← Profile feature overview
-│   │   └── index.ts      # ← ONLY entry point
-│   └── dashboard/        # Level 2 Feature (can use auth + profile)
-│       ├── understandMe.md  # ← Dashboard architecture
-│       └── index.ts      # ← ONLY entry point
-```
-
-**Remember**: Features should be able to be developed in complete isolation once the foundation is set. If you can't build your feature without touching another feature's code, the architecture is broken.
-
-### Feature Documentation with understandMe.md
-
-**EVERY feature and the foundation layer MUST have an `understandMe.md` file**. These are your quick reference guides:
-
-**When to use understandMe.md:**
-- Read it FIRST when starting work on any feature/foundation layer
-- Update it AFTER completing significant changes
-- Keep it open while working on complex features
-
-**What goes in understandMe.md (keep it under 50 lines):**
-```markdown
-# [Feature Name] - Quick Reference
-
-## Purpose (1-2 lines)
-What this feature/layer does and why it exists.
-
-## Key Files
-- `index.ts` - Public API, exports X, Y, Z
-- `core.ts` - Main logic for [specific responsibility]
-- `utils.ts` - Helper functions for [what they help with]
-
-## How It Works (5-10 lines max)
-1. User calls `doThing()` from index
-2. Validates input via `validateThing()`
-3. Processes through `coreLogic()`
-4. Returns `ThingResult`
-
-## Dependencies
-- Uses: platform/auth, platform/utils
+- Uses: core/auth, core/utils
 - Used by: dashboard, admin-panel
 
 ## Key Decisions
@@ -188,3 +110,14 @@ What this feature/layer does and why it exists.
 - **No fluff** - Every line must provide immediate value
 - **Update sparingly** - Only when core behavior changes
 - **Think "cheat sheet"** not "documentation"
+
+## Architecture Checklist
+
+□ Each feature has single owner?  
+□ All imports go through index files?  
+□ No horizontal dependencies?  
+□ Every feature has understandMe.md?  
+□ Can build feature without touching others?  
+□ Public API exports ONLY what consumers need?  
+□ Using external libraries over custom solutions?  
+□ Organization matches complexity, not rigid rules?

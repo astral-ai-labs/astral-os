@@ -1,6 +1,7 @@
 ---
 alwaysApply: false
 ---
+
 # Core Development Philosophy
 
 **Universal Principle:** Write code with absolute clarity as the top priority. Choose the most straightforward solution that any developer can understand at first glance.
@@ -9,12 +10,13 @@ alwaysApply: false
 
 ## Development Philosophy
 
-- **KISS (Keep It Simple, Stupid):** Prefer simple, direct solutions over clever or complex ones.
-- **YAGNI (You Aren’t Gonna Need It):** Build only what is needed today. Don’t implement features on speculation.
+- **Delete, delete, delete:** The best feature is no feature. Ask "What happens if we don't build this at all?" before writing a single line.
+- **Complex = bad:** If it's complex, it sucks and needs to go. Simple systems win long-term.
+- **Build only what's needed today:** Don't implement features on speculation.
 - **Fewest lines, straightforward over clever:** Implement in the simplest way possible without sacrificing clarity.
 - **Single Responsibility:** Each function, class, and module should do one clear thing.
-- **Five-minute rule:** If you can’t explain it in 5 minutes, it’s too complex.
-- **Write for humans first:** Clever code is bad code.
+- **Five-minute rule:** If you can't explain it in 5 minutes, it's too complex.
+- **Write for humans first:** Clever code is bad code. Code that everyone can understand beats code that only experts can maintain.
 
 **Simple means:**
 
@@ -22,6 +24,12 @@ alwaysApply: false
 - Clear names: `calculateMonthlyPayment()` not `calc()`
 - Max three nesting levels → prefer early returns
 - Code should be self-documenting
+
+---
+
+## The Deletion Hierarchy
+
+**Nothing is better than something complex.** Users can't break what doesn't exist. Nothing has zero maintenance cost and infinite scalability.
 
 ---
 
@@ -37,7 +45,7 @@ Code is read far more often than it is written. Every line will be read dozens o
 - Names should be searchable and pronounceable
 - Use consistent vocabulary across the codebase
 
-### Don’t Repeat Yourself
+### Don't Repeat Yourself
 
 - Extract repeated logic into private functions or helpers
 - Extract repeated UI markup into reusable components
@@ -46,7 +54,7 @@ Code is read far more often than it is written. Every line will be read dozens o
 ### Fail Fast & Simple
 
 - Validate only uncertain inputs (user input, API responses, external data)
-- Don’t re-validate what the type system guarantees
+- Don't re-validate what the type system guarantees
 - One try/catch (or try/except) per function max
 - Never swallow errors silently
 - Log with context, then handle or re-raise
@@ -97,7 +105,7 @@ def calculate_tax(amount: float, rate: float) -> float:
 
 ### File & Function Size
 
-- Functions should be short (under \~50 lines) and do one thing.
+- Functions should be short (under ~50 lines) and do one thing.
 - Files should stay manageable (<500 lines). Split if getting too long.
 - Classes should be small and represent a single entity.
 
@@ -109,4 +117,4 @@ def calculate_tax(amount: float, rate: float) -> float:
 
 ---
 
-**Remember:** Prioritize human understanding above all else. If someone needs more than 30 seconds to understand what a function does, rewrite it.
+**Remember:** Prioritize human understanding above all else. If someone needs more than 30 seconds to understand what a function does, rewrite it. Complexity is the enemy of execution. Simple solutions are easier to understand, maintain, debug, and scale.

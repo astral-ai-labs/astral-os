@@ -1,11 +1,12 @@
 DEVELOPMENT PHILOSOPHY
 
-1. Keep it as simple as possible → Fewest lines, straightforward over clever.
-2. Build only when needed → Do not add features on speculation.
-3. One responsibility → Each function, class, or module has a single clear purpose.
-4. Avoid repetition → Extract common code, but do not over-optimize.
-5. The five-minute rule → If you cannot explain it quickly, it is too complex.
-6. Write for humans first → Clever code is bad code.
+1. Delete, delete, delete → The best feature is no feature. Ask "What happens if we don't build this at all?"
+2. Keep it as simple as possible → Fewest lines, straightforward over clever.
+3. Build only when needed → Do not add features on speculation.
+4. One responsibility → Each function, class, or module has a single clear purpose.
+5. Avoid repetition → Extract common code, but do not over-optimize.
+6. The five-minute rule → If you cannot explain it quickly, it is too complex.
+7. Write for humans first → Clever code is bad code.
 
 What "as simple as possible" means
 

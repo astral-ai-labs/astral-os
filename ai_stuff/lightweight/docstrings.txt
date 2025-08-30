@@ -1,0 +1,5 @@
+DOCSTRINGS & COMMENTS GUIDELINES
+
+1. Docstrings → One line if possible, max three.
+2. Explain why, not what → The code should already shows what it does in a very clear way.
+3. Type hints → Always, always, always present; docstrings should not duplicate them.

@@ -1,6 +1,3 @@
----
-alwaysApply: false
----
 # High Level Architectural Philosophy
 
 ## Core Principle: Build in Isolation, Integrate Through Interfaces
@@ -9,15 +6,16 @@ Every project follows a **layered feature architecture** that enables parallel d
 
 ## Architecture Layers
 
-1. **Foundation Layer** (`/core`)
+1. **Core Layer** (`/core`)
+
    - Shared utilities, configs, base components, db, domain types and data access
-   - Once established, remains stable - no refactoring during feature development
+   - Stable during feature sprints - only bug fixes or security patches
    - All features can depend on this layer
 
 2. **Feature Layers** (Level 1, 2, 3...)
    - Each feature is self-contained with ALL its logic
    - Features expose functionality ONLY through their interface (`index.ts` or `__init__.py`)
-   - Dependencies flow DOWN only: Level 2 → Level 1 → Foundation
+   - Dependencies flow DOWN only: Level 2 → Level 1 → Core
    - NO horizontal dependencies within the same level
    - Shared code within a layer goes in `/common`
 
@@ -29,13 +27,14 @@ Every project follows a **layered feature architecture** that enables parallel d
 - **Git Flow Ready**: Each feature = one branch = one merge request
 - **Use External Libraries**: Prefer external solutions over custom implementations
 - **Export Minimally**: Only export what external consumers actually need
+- **Duplicate First, Abstract Later**: If two features need the same logic, copy it once then extract to core after both features ship
 
 ## Structure
 
 ```
 project/
-├── core/                   # Foundation Layer
-│   ├── understandMe.md    # ← How core layer works
+├── core/                   # Core foundational layer
+│   ├── understandMe.md    # How core layer works
 │   ├── utils/
 │   ├── config/
 │   ├── db/
@@ -43,18 +42,25 @@ project/
 ├── api/                   # For API projects only
 ├── features/
 │   ├── authentication/    # Level 1 Feature
-│   │   ├── understandMe.md  # ← What auth does & how
-│   │   ├── index.ts      # ← ONLY entry point
+│   │   ├── understandMe.md  # What auth does & how
+│   │   ├── index.ts      # ONLY entry point
+│   │   ├── /internal/    # Hide implementation details
+│   │   │   ├── _helpers.ts
+│   │   │   ├── _validation.ts
+│   │   │   └── _handlers.ts
 │   │   └── ...           # Internal organization by complexity
 │   ├── user-profile/     # Level 1 Feature
 │   │   ├── understandMe.md
-│   │   └── index.ts      
-│   ├── common/           # Shared Level 1 utilities
+│   │   ├── index.ts
+│   │   └── /internal/
+│   │       └── _profile-utils.ts
+│   ├── common/           # Shared Level 1 utilities only
 │   │   └── utils.ts
 │   └── dashboard/        # Level 2 Feature (can use auth + profile)
 │       ├── understandMe.md
-│       ├── index.ts      # ← Can import from authentication/index.ts
-│       └── common/       # Shared Level 2 utilities
+│       ├── index.ts      # Can import from authentication/index.ts
+│       ├── /internal/
+│       │   └── _dashboard-helpers.ts
 ```
 
 **For Web APIs** (FastAPI/Express): Add a separate `/api` module with routers that expose feature functionality through HTTP endpoints. The API layer depends on features, never the reverse.
@@ -65,7 +71,8 @@ project/
 
 - **Start simple** - organize by complexity, not by rigid file types
 - **Main components get directories** when substantial (100+ lines)
-- **Supporting code stays as files** until it grows large
+- **Hide implementation in `/internal`** - all files prefixed with `_`
+- **Shared layer code goes in `/common`** - used throughout that layer only
 - **Use external libraries** over custom solutions
 - **Export minimally** - only what external consumers need
 
@@ -74,38 +81,46 @@ project/
 **EVERY feature and the core layer MUST have an `understandMe.md` file**. These are your quick reference guides:
 
 **When to use understandMe.md:**
+
 - Read it FIRST when starting work on any feature/core layer
 - Update it AFTER completing significant changes
 - Keep it open while working on complex features
 
 **What goes in understandMe.md (keep it under 50 lines):**
+
 ```markdown
 # [Feature Name] - Quick Reference
 
 ## Purpose (1-2 lines)
+
 What this feature/layer does and why it exists.
 
 ## Key Files
+
 - `index.ts` - Public API, exports X, Y, Z
-- `core.ts` - Main logic for [specific responsibility]
-- `utils.ts` - Helper functions for [what they help with]
+- `internal/_core.ts` - Main logic for [specific responsibility]
+- `internal/_utils.ts` - Helper functions for [what they help with]
 
 ## How It Works (5-10 lines max)
+
 1. User calls `doThing()` from index
-2. Validates input via `validateThing()`
-3. Processes through `coreLogic()`
+2. Validates input via `_validateThing()`
+3. Processes through `_coreLogic()`
 4. Returns `ThingResult`
 
 ## Dependencies
+
 - Uses: core/auth, core/utils
 - Used by: dashboard, admin-panel
 
 ## Key Decisions
+
 - Why we use [approach X] instead of [approach Y]
 - [Any non-obvious architectural choices]
 ```
 
 **Golden Rules for understandMe.md:**
+
 - **Be ruthless about brevity** - If it's over 50 lines, cut it down
 - **When editing, prefer removing over adding** - Clarity through simplicity
 - **No fluff** - Every line must provide immediate value
@@ -114,11 +129,11 @@ What this feature/layer does and why it exists.
 
 ## Architecture Checklist
 
-□ Each feature has single owner?  
-□ All imports go through index files?  
-□ No horizontal dependencies?  
-□ Every feature has understandMe.md?  
-□ Can build feature without touching others?  
-□ Public API exports ONLY what consumers need?  
-□ Using external libraries over custom solutions?  
-□ Organization matches complexity, not rigid rules?
+- Each feature has single owner?
+- All imports go through index files?
+- No horizontal dependencies?
+- Every feature has understandMe.md?
+- Can build feature without touching others?
+- Public API exports ONLY what consumers need?
+- Using external libraries over custom solutions?
+- Organization matches complexity, not rigid rules?

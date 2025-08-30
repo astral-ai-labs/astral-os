@@ -1,0 +1,30 @@
+ERROR HANDLING GUIDELINES
+
+Core Principle: Fail Fast & Simple
+
+Key Rules
+1. Validate only uncertain inputs: Guard against values that can realistically be None, empty, or malformed (e.g. external data, user input, API payloads). Don't re-validate things guaranteed correct by type hints or invariants.
+2. Catch only what you can handle: Let other exceptions bubble up. 
+3. Never swallow errors silently: No empty except blocks. 
+4. One try/except per function max: If you need more, refactor.
+5. Log with structured context: Use logger.error({"user_id": user_id, "error": str(e)}, "Payment failed") instead of string concatenation when context helps debugging.
+
+Pattern
+
+Bad
+try:
+    process_payment()
+    send_email() 
+    update_database()
+except:
+    pass  # Silent failure
+
+Good
+if not payment_data.is_valid():
+    raise ValueError(f"Invalid payment data: {payment_data.errors}")
+
+try:
+    result = process_payment(payment_data)
+except PaymentAPIError as e:
+    logger.error({"user_id": user_id, "error": str(e)}, "Payment failed")
+    raise  # Let caller handle

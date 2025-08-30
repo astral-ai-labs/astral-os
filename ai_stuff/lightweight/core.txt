@@ -1,0 +1,27 @@
+DEVELOPMENT PHILOSOPHY
+
+1. Keep it as simple as possible → Fewest lines, straightforward over clever.
+2. Build only when needed → Do not add features on speculation.
+3. One responsibility → Each function, class, or module has a single clear purpose.
+4. Avoid repetition → Extract common code, but do not over-optimize.
+5. The five-minute rule → If you cannot explain it quickly, it is too complex.
+6. Write for humans first → Clever code is bad code.
+
+What "as simple as possible" means
+
+1. Understandable in under 30 seconds → If it takes longer, rewrite it.
+2. Clear, consistent, descriptive names → calculate_monthly_payment() not calc().
+3. Max three nesting levels → Prefer early returns to deep nesting.
+4. Whitespace between logical groups → Let the code breathe.
+5. Numbered comments for multi-step flows →
+	# 1️⃣ Validate the inputs ----
+	# 2️⃣ Process ----
+	# 3️⃣ Return ----
+
+Design Patterns
+
+1. Prefer functions → Default to simple functions; use classes sparingly only for state or orchestration. This does not apply to TSX/JSX obviously.
+
+2. Code size limits → Files: max 500 lines, Functions: max 50 lines, Classes: max 100 lines
+
+3. Interface boundaries → Only import from index files (unless intra-module).

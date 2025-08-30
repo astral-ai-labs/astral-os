@@ -1,42 +1,112 @@
-This file provides comprehensive guidance across all projects. You MUST adhere to these
+---
+alwaysApply: false
+---
+# Core Development Philosophy
 
-## Core Development Philosophy
+**Universal Principle:** Write code with absolute clarity as the top priority. Choose the most straightforward solution that any developer can understand at first glance.
 
-### KISS (Keep It Simple, Stupid)
+---
 
-Simplicity should be a key goal in design. Choose straightforward solutions over complex ones whenever possible. Simple solutions are easier to understand, maintain, and debug.
+## Development Philosophy
 
-**Implementation Guidelines:**
+- **KISS (Keep It Simple, Stupid):** Prefer simple, direct solutions over clever or complex ones.
+- **YAGNI (You Aren’t Gonna Need It):** Build only what is needed today. Don’t implement features on speculation.
+- **Fewest lines, straightforward over clever:** Implement in the simplest way possible without sacrificing clarity.
+- **Single Responsibility:** Each function, class, and module should do one clear thing.
+- **Five-minute rule:** If you can’t explain it in 5 minutes, it’s too complex.
+- **Write for humans first:** Clever code is bad code.
 
-- Implement code in the fewest lines possible without sacrificing clarity
-- Avoid over-engineering solutions - solve today's problem, not tomorrow's hypothetical one
-- Choose straightforward approaches over clever ones
+**Simple means:**
 
-### YAGNI (You Aren't Gonna Need It)
+- Understandable in under 30 seconds
+- Clear names: `calculateMonthlyPayment()` not `calc()`
+- Max three nesting levels → prefer early returns
+- Code should be self-documenting
 
-Avoid building functionality on speculation. Implement features only when they are needed, not when you anticipate they might be useful in the future.
+---
 
-### Design Principles
+## Core Principles
 
-- **Single Responsibility**: Each function, class, and module should have one clear purpose.
-- **Don't Repeat Yourself (DRY)**: Every piece of knowledge should have a single, unambiguous representation in the system.
-  - Extract repeated business logic to private methods
-  - Extract repeated UI markup to reusable components
-  - Create utility functions for common operations
-- **Fail Fast**: Check for potential errors early and raise exceptions immediately when issues occur.
-- **Simple Error Handling**: Errors should be obvious, actionable, and caught at the boundary.
-  - Validate inputs at function entry points, fail immediately with clear messages
-  - Let exceptions bubble up - only catch what you can actually handle
-  - Never silently swallow errors (no empty except/catch blocks)
-  - Log errors with context, then either handle or re-raise
-  - One try-catch per function maximum - if you need more, refactor
-  - Example: `if not user_id: raise ValueError("user_id is required")` at function start
-- **Principle of Least Surprise**: Code should behave in the way that most users will expect it to behave. Avoid surprising or clever implementations.
-- **Separation of Concerns**: Different areas of functionality should be managed by distinct sections of code with minimal overlap.
-- **Prefer Functions Over Services**: Default to simple, pure functions organized in logical modules. Avoid unnecessary abstraction layers.
-  - Start with standalone functions that do one thing well
-  - Group related functions in well-named modules (e.g., `user_utils.py`, `validation.ts`)
-  - Only create service classes when you genuinely need: stateful operations, resource management, or complex orchestration
-  - Keep module interfaces simple and predictable
-  - Example: `calculate_tax(amount)` in `finance_utils.py` is better than `TaxCalculationService` unless you need tax rate caching or external API calls
-- **Singleton Pattern for Clients**: Use singleton pattern for expensive-to-create clients like database connections, Redis clients, Celery workers, API clients, HTTP sessions, and external service connectors. Initialize once, reuse everywhere.
+### Readability First
+
+Code is read far more often than it is written. Every line will be read dozens of times by yourself and others.
+
+**Naming:**
+
+- Use descriptive, unambiguous names that explain intent
+- Names should be searchable and pronounceable
+- Use consistent vocabulary across the codebase
+
+### Don’t Repeat Yourself
+
+- Extract repeated logic into private functions or helpers
+- Extract repeated UI markup into reusable components
+- Create utilities for common operations
+
+### Fail Fast & Simple
+
+- Validate only uncertain inputs (user input, API responses, external data)
+- Don’t re-validate what the type system guarantees
+- One try/catch (or try/except) per function max
+- Never swallow errors silently
+- Log with context, then handle or re-raise
+
+### Architecture Patterns
+
+- **Function-first design:** Default to simple, pure functions organized in logical modules.
+- **Classes only when needed:** For singletons or true stateful objects.
+- **Separation of concerns:** Keep unrelated responsibilities apart. Modules and files should map cleanly to distinct purposes.
+- **Singletons** Follow these gudelines: ✅ Use for expensive, stateless clients (API/HTTP clients, external services). ❌ Avoid for database connections/sessions in Python — use dependency injection or factories for proper context management. ✅ In TypeScript, DB clients can be singletons for connection pooling, but keep minimal
+
+### Principle of Least Surprise
+
+Code should behave in the way other developers expect. Avoid clever tricks.
+
+---
+
+## Documentation & Comments
+
+### Docstrings
+
+- **Keep them simple.** A short sentence is enough.
+- **Say what the function does, not how.**
+- **Document inputs and outputs ONLY when not obvious.**
+- **Always document edge cases and error conditions.**
+
+```python
+# ❌ Too much detail
+def calculate_tax(amount: float, rate: float) -> float:
+    """
+    This function calculates tax by multiplying the amount with the tax rate,
+    converting the rate to a percentage by dividing by 100, and then returning the result.
+    """
+
+# ✅ Simple and clear
+def calculate_tax(amount: float, rate: float) -> float:
+    """Return tax for a given amount and percentage rate."""
+```
+
+### Comments
+
+- Comments explain **why**, not what.
+- Keep comments updated — outdated comments are worse than none.
+
+---
+
+## Practical Guidelines
+
+### File & Function Size
+
+- Functions should be short (under \~50 lines) and do one thing.
+- Files should stay manageable (<500 lines). Split if getting too long.
+- Classes should be small and represent a single entity.
+
+### Dependencies
+
+- Keep dependency count minimal.
+- Choose well-maintained, popular libraries with clear docs.
+- Prefer stable, established libraries over experimental ones.
+
+---
+
+**Remember:** Prioritize human understanding above all else. If someone needs more than 30 seconds to understand what a function does, rewrite it.

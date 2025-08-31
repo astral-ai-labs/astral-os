@@ -13,13 +13,14 @@ alwaysApply: false
 - **Delete, delete, delete:** The best feature is no feature. Ask "What happens if we don't build this at all?" before writing a single line.
 - **Complex = bad:** If it's complex, it sucks and needs to go. Simple systems win long-term.
 - **Build only what's needed today:** Don't implement features on speculation.
-- **Fewest lines, straightforward over clever:** Implement in the simplest way possible without sacrificing clarity.
+- **Straightforward over clever:** Readable code beats short code. Implement in the simplest way possible without sacrificing clarity.
 - **Single Responsibility:** Each function, class, and module should do one clear thing.
 - **Five-minute rule:** If you can't explain it in 5 minutes, it's too complex.
 - **Write for humans first:** Clever code is bad code. Code that everyone can understand beats code that only experts can maintain.
 
 **Simple means:**
 
+- **Simple ≠ Short:** Verbose, descriptive code is better than terse, cryptic code
 - Understandable in under 30 seconds
 - Clear names: `calculateMonthlyPayment()` not `calc()`
 - Max three nesting levels → prefer early returns
@@ -105,7 +106,7 @@ def calculate_tax(amount: float, rate: float) -> float:
 
 ### File & Function Size
 
-- Functions should be short (under ~50 lines) and do one thing.
+- Functions should be short (under ~50 lines) and do one thing. These are maximums, not targets.
 - Files should stay manageable (<500 lines). Split if getting too long.
 - Classes should be small and represent a single entity.
 
@@ -117,4 +118,4 @@ def calculate_tax(amount: float, rate: float) -> float:
 
 ---
 
-**Remember:** Prioritize human understanding above all else. If someone needs more than 30 seconds to understand what a function does, rewrite it. Complexity is the enemy of execution. Simple solutions are easier to understand, maintain, debug, and scale.
+**Remember:** Prioritize human understanding above all else. Choose verbose, clear code over clever one-liners. If someone needs more than 30 seconds to understand what a function does, rewrite it. Complexity is the enemy of execution. Simple solutions are easier to understand, maintain, debug, and scale.

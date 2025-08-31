@@ -1,7 +1,7 @@
 DEVELOPMENT PHILOSOPHY
 
 1. Delete, delete, delete → The best feature is no feature. Ask "What happens if we don't build this at all?"
-2. Keep it as simple as possible → Fewest lines, straightforward over clever.
+2. Keep it as simple as possible → Straightforward over clever. Readable beats short.
 3. Build only when needed → Do not add features on speculation.
 4. One responsibility → Each function, class, or module has a single clear purpose.
 5. Avoid repetition → Extract common code, but do not over-optimize.
@@ -9,6 +9,8 @@ DEVELOPMENT PHILOSOPHY
 7. Write for humans first → Clever code is bad code.
 
 What "as simple as possible" means
+
+⚠️  Simple does NOT mean short → Verbose, clear code beats terse, cryptic code.
 
 1. Understandable in under 30 seconds → If it takes longer, rewrite it.
 2. Clear, consistent, descriptive names → calculate_monthly_payment() not calc().
@@ -23,6 +25,6 @@ Design Patterns
 
 1. Prefer functions → Default to simple functions; use classes sparingly only for state or orchestration. This does not apply to TSX/JSX obviously.
 
-2. Code size limits → Files: max 500 lines, Functions: max 50 lines, Classes: max 100 lines
+2. Code size limits → These are maximums, not targets. Files: max 500 lines, Functions: max 50 lines, Classes: max 100 lines
 
 3. Interface boundaries → Only import from index files (unless intra-module).
